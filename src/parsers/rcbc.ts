@@ -1,9 +1,8 @@
 import { KreditTransaction } from '../types'
 
-export function parseRCBC(text: string): KreditTransaction[] {
-  const regex = /^([\d,]+\.\d{2}-?)\t(\d{2}\/\d{2}\/\d{2}) (\d{2}\/\d{2}\/\d{2}) (.+)$/
-
-  return text
+const regex = /^([\d,]+\.\d{2}-?)\t(\d{2}\/\d{2}\/\d{2}) (\d{2}\/\d{2}\/\d{2}) (.+)$/
+export const parseRCBC = (text: string): KreditTransaction[] =>
+  text
     .split('\n')
     .map((line) => regex.exec(line))
     .filter((m): m is RegExpExecArray => m !== null)
@@ -19,4 +18,3 @@ export function parseRCBC(text: string): KreditTransaction[] {
         amount,
       }
     })
-}

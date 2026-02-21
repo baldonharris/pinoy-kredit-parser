@@ -1,9 +1,8 @@
 import { KreditTransaction } from '../types'
 
-export function parseMetrobank(text: string): KreditTransaction[] {
-  const regex = /^"?(\d{2}\/\d{2})\s+(\d{2}\/\d{2})\s+(.+?)\s+([\d,]+\.\d{2}C?)"?$/
-
-  return text
+const regex = /^"?(\d{2}\/\d{2})\s+(\d{2}\/\d{2})\s+(.+?)\s+([\d,]+\.\d{2}C?)"?$/
+export const parseMetrobank = (text: string): KreditTransaction[] =>
+  text
     .split('\n')
     .map((line) => regex.exec(line))
     .filter((m): m is RegExpExecArray => m !== null)
@@ -19,4 +18,3 @@ export function parseMetrobank(text: string): KreditTransaction[] {
         amount: isCredit ? -clean : clean,
       }
     })
-}
