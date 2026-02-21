@@ -1,11 +1,14 @@
-import { PDFParse } from "pdf-parse"
-import { BankType, KreditTransaction } from "./types"
-import { parseRCBC } from "./parsers/rcbc"
-import { parseMetrobank } from "./parsers/metrobank"
-import { parseUnionBank } from "./parsers/unionbank"
-import {readFileSync} from "fs";
+import { PDFParse } from 'pdf-parse'
+import { BankType, KreditTransaction } from './types'
+import { parseRCBC } from './parsers/rcbc'
+import { parseMetrobank } from './parsers/metrobank'
+import { parseUnionBank } from './parsers/unionbank'
+import { readFileSync } from 'fs'
 
-type ParseKredit = (pdfFilePath: string, options: {bank: BankType}) => Promise<KreditTransaction[]>
+type ParseKredit = (
+  pdfFilePath: string,
+  options: { bank: BankType },
+) => Promise<KreditTransaction[]>
 export const parseKredit: ParseKredit = async (pdfFilePath, options) => {
   const buffer = readFileSync(pdfFilePath)
 
@@ -25,6 +28,6 @@ export const parseKredit: ParseKredit = async (pdfFilePath, options) => {
       return parseUnionBank(text)
 
     default:
-      throw new Error("Unsupported bank type")
+      throw new Error('Unsupported bank type')
   }
 }

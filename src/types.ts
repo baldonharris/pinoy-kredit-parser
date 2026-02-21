@@ -6,7 +6,7 @@ export type KreditTransaction = {
 }
 
 export enum BankType {
-  RCBC = "rcbc",
-  METROBANK = "metrobank",
-  UNIONBANK = "unionbank"
+  RCBC = 'rcbc',
+  METROBANK = 'metrobank',
+  UNIONBANK = 'unionbank',
 }

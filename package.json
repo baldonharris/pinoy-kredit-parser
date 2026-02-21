@@ -5,9 +5,13 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier --write 'src/**/*.ts'",
+    "format:check": "prettier --check 'src/**/*.ts'"
   },
   "keywords": [
     "philippines",
@@ -22,6 +26,10 @@
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
