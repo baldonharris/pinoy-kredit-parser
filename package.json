@@ -4,6 +4,14 @@
   "description": "Philippine credit card statement parser",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baldonharris/pinoy-kredit-parser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/baldonharris/pinoy-kredit-parser/issues"
+  },
+  "homepage": "https://github.com/baldonharris/pinoy-kredit-parser#readme",
   "files": [
     "dist"
   ],
