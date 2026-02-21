@@ -105,3 +105,21 @@ BankType.UNIONBANK
 
 Contributions are welcome! Especially for adding support for more Philippine banks.
 If a parser breaks due to layout fixes, feel free to submit fixes.
+
+---
+
+## Privacy & Security
+
+**Your data never leaves your machine.**
+This library is a local parser. It does not send your PDF data or transaction details to any external servers. All processing happens within your Node.js environment.
+
+- **No Data Collection:** This library does not include any telemetry or tracking.
+- **Local Only:** Ensure you run this in a secure environment and never share your raw statement PDFs.
+
+## Legal Disclaimer
+
+This project is **not affiliated, associated, authorized, endorsed by, or in any way officially connected** with RCBC, Metrobank, UnionBank, or any of their subsidiaries or affiliates.
+
+- This tool is for **personal and educational use only**.
+- Users are responsible for complying with the **Data Privacy Act of 2012 (RA 10173)** when handling financial data.
+- The author is not responsible for any financial loss, data breaches, or inaccuracies caused by the use of this software.
