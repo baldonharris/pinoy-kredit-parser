@@ -1,4 +1,4 @@
-import { KreditTransaction } from 'src/types'
+import { KreditTransaction } from '../types'
 
 const regex =
   /^"?(\d{2}\/\d{2}\/\d{2})\s+(\d{2}\/\d{2}\/\d{2})\s+(.+?)\s+PHP\s+(-?[\d,]+\.\d{2})"?$/
