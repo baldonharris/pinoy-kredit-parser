@@ -1,5 +1,5 @@
 {
-  "name": "pinoy-kredit-parser",
+  "name": "@hbaldon93/pinoy-kredit-parser",
   "version": "1.0.0",
   "description": "Philippine credit card statement parser",
   "main": "dist/index.js",
