@@ -1,0 +1,28 @@
+{
+  "name": "pinoy-kredit-parser",
+  "version": "1.0.0",
+  "description": "Philippine credit card statement parser",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "philippines",
+    "credit-card",
+    "statement",
+    "parser",
+    "finance"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "pdf-parse": "^2.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
