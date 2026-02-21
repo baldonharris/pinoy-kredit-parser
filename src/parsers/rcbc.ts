@@ -1,4 +1,4 @@
-import { KreditTransaction } from '../types'
+import { KreditTransaction } from 'src/types'
 
 const regex = /^([\d,]+\.\d{2}-?)\t(\d{2}\/\d{2}\/\d{2}) (\d{2}\/\d{2}\/\d{2}) (.+)$/
 export const parseRCBC = (text: string): KreditTransaction[] =>

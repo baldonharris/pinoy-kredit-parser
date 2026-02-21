@@ -1,9 +1,9 @@
 import { PDFParse } from 'pdf-parse'
-import { BankType, KreditTransaction } from './types'
-import { parseRCBC } from './parsers/rcbc'
-import { parseMetrobank } from './parsers/metrobank'
-import { parseUnionBank } from './parsers/unionbank'
 import { readFileSync } from 'fs'
+import { BankType, KreditTransaction } from 'src/types'
+import { parseRCBC } from 'src/parsers/rcbc'
+import { parseMetrobank } from 'src/parsers/metrobank'
+import { parseUnionBank } from 'src/parsers/unionbank'
 
 type ParseKredit = (
   pdfFilePath: string,
