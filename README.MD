@@ -39,7 +39,7 @@ npm install pinoy-kredit-parser
 ---
 
 ## Usage
-
+### Using a file path (Node.js)
 ```javascript
 const { parseKredit, BankType } = require('pinoy-kredit-parser')
 
@@ -52,6 +52,18 @@ async function main() {
 }
 
 main()
+```
+### Using a File object (Browser / modern runtimes)
+```javascript
+import { parseKredit, BankType } from 'pinoy-kredit-parser'
+
+async function handleFile(file) {
+  const transactions = await parseKredit(file, {
+    bank: BankType.METROBANK,
+  })
+
+  console.log(transactions)
+}
 ```
 
 ---
@@ -115,6 +127,8 @@ This library is a local parser. It does not send your PDF data or transaction de
 
 - **No Data Collection:** This library does not include any telemetry or tracking.
 - **Local Only:** Ensure you run this in a secure environment and never share your raw statement PDFs.
+
+---
 
 ## Legal Disclaimer
 
