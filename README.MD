@@ -1,6 +1,6 @@
 # pinoy-kredit-parser
 
-A lightweight Node.js library for parsing Philippine credit card statement PDFs into structured transaction data.
+A lightweight, isomorphic library for parsing Philippine credit card statement PDFs into structured transaction data. Works in Node.js, Browsers, and Next.js.
 
 Currently supports:
 
@@ -39,44 +39,50 @@ npm install pinoy-kredit-parser
 ---
 
 ## Usage
+The library automatically detects your environment (Node vs. Browser) to provide the correct parsing engine.
+
 ### Using a file path (Node.js)
 ```javascript
-const { parseKredit, BankType } = require('pinoy-kredit-parser')
+import { parseKredit, BankType } from 'pinoy-kredit-parser';
 
-async function main() {
-  const transactions = await parseKredit('statement.pdf', {
+const transactions = await parseKredit('./statement.pdf', {
     bank: BankType.RCBC,
-  })
-
-  console.log(transactions)
-}
-
-main()
+});
 ```
-### Using a File object (Browser / modern runtimes)
+### Browser / Next.js Client Components (File or ArrayBuffer)
 ```javascript
-import { parseKredit, BankType } from 'pinoy-kredit-parser'
+import { parseKredit, BankType } from 'pinoy-kredit-parser';
 
-async function handleFile(file) {
-  const transactions = await parseKredit(file, {
-    bank: BankType.METROBANK,
-  })
+const handleUpload = async (event) => {
+    const file = event.target.files[0];
+    const transactions = await parseKredit(file, {
+        bank: BankType.UNIONBANK,
+    });
+};
+```
 
-  console.log(transactions)
-}
+### Next.js (App Router / API Routes)
+When using this library in Next.js, you must add it to `serverExternalPackages` in your `next.config.ts` to correctly handle the native PDF rendering binaries.
+```javascript
+// next.config.ts
+const nextConfig = {
+  experimental: {
+    serverExternalPackages: ['pinoy-kredit-parser', 'pdf-parse', '@napi-rs/canvas'],
+  },
+};
 ```
 
 ---
 
 ## Output Format
 
-Each transaction is returned as:
+Transactions are returned in a clean, structured format:
 ```typescript
 type KreditTransaction = {
-  saleDate: string
-  postDate: string
-  description: string
-  amount: number
+  saleDate: string;    // MM/DD/YY
+  postDate: string;    // MM/DD/YY
+  description: string;
+  amount: number;      // Positive for purchases, negative for payments/credits
 }
 ```
 Example:
@@ -90,6 +96,12 @@ Example:
   }
 ]
 ```
+---
+## Features
+- **Isomorphic:** Shared logic for server-side and client-side parsing.
+- **Zero Global Pollution:** No need for manual DOMMatrix or Canvas polyfills.
+- **Next.js Ready:** Optimized for modern frameworks with automatic environment detection.
+- **Privacy-First:** All parsing happens locally on your machine. No data is ever sent to a server.
 
 ---
 
