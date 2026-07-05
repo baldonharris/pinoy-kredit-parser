@@ -1,6 +1,6 @@
 {
   "name": "pinoy-kredit-parser",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Philippine credit card statement parser",
   "main": "./dist/node.js",
   "browser": "./dist/browser.js",

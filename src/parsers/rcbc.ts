@@ -1,23 +1,50 @@
 import { KreditTransaction } from '../types'
 
+// Standard domestic line: AMOUNT\tSALE_DATE POST_DATE DESCRIPTION
 const regex = /^([\d,]+\.\d{2}-?)\t(\d{2}\/\d{2}\/\d{2}) (\d{2}\/\d{2}\/\d{2}) (.+)$/
-export const parseRCBC = (text: string): KreditTransaction[] =>
-  text
-    .split('\n')
-    .map((line) => regex.exec(line))
-    .filter((m): m is RegExpExecArray => m !== null)
-    .map(([, amountStr, saleDate, postDate, description]) => {
-      const cleanAmount = parseFloat(amountStr.replace(/,/g, '').replace('-', ''))
+// Foreign-currency line: SALE_DATE POST_DATE DESCRIPTION AMOUNT (followed by FX_CODE AMOUNT on next line)
+const fxRegex = /^(\d{2}\/\d{2}\/\d{2}) (\d{2}\/\d{2}\/\d{2}) (.+) ([\d,]+\.\d{2}-?)$/
+const fxTrailingLine = /^[A-Z]{3} [\d,]+\.\d{2}$/
 
-      const amount = amountStr.endsWith('-') ? -cleanAmount : cleanAmount
+const toAmount = (amountStr: string): number => {
+  const clean = parseFloat(amountStr.replace(/,/g, '').replace('-', ''))
+  return amountStr.endsWith('-') ? -clean : clean
+}
 
-      return {
+export const parseRCBC = (text: string): KreditTransaction[] => {
+  const lines = text.split('\n')
+  const results: KreditTransaction[] = []
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+
+    const m = regex.exec(line)
+    if (m) {
+      const [, amountStr, saleDate, postDate, description] = m
+      results.push({
         saleDate,
         postDate,
         description: description.trim(),
-        amount,
-      }
-    })
+        amount: toAmount(amountStr),
+      })
+      continue
+    }
+
+    const fx = fxRegex.exec(line)
+    if (fx) {
+      const [, saleDate, postDate, description, amountStr] = fx
+      if (fxTrailingLine.test((lines[i + 1] ?? '').trim())) i++
+      results.push({
+        saleDate,
+        postDate,
+        description: description.trim(),
+        amount: toAmount(amountStr),
+      })
+    }
+  }
+
+  return results
+}
 
 const metaRegex = /([A-Z]{3} \d{2} \d{4})\t([A-Z]{3} \d{2} \d{4})\nPAYMENT DUE DATE\tSTATEMENT DATE/
 

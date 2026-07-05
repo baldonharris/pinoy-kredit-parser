@@ -10,7 +10,7 @@
 `pinoy-kredit-parser` is a lightweight, isomorphic TypeScript library that parses Philippine credit card statement PDFs into structured transaction data.
 
 - **Package name:** `pinoy-kredit-parser`
-- **Version:** `1.3.1`
+- **Version:** `1.3.2`
 - **License:** MIT
 - **Registry:** npm
 - **Repo:** https://github.com/baldonharris/pinoy-kredit-parser
@@ -151,11 +151,23 @@ Package `exports` field in `package.json` routes consumers to the correct build 
 
 ### 5.1 RCBC (`src/parsers/rcbc.ts`)
 
-**Regex:** `^([\d,]+\.\d{2}-?)\t(\d{2}\/\d{2}\/\d{2}) (\d{2}\/\d{2}\/\d{2}) (.+)$`
+RCBC statements contain two transaction line formats:
 
-**Column order in raw text:** `amount \t saleDate postDate description`
+**Standard (domestic) format:**
 
-**Amount sign convention:**
+Regex: `^([\d,]+\.\d{2}-?)\t(\d{2}\/\d{2}\/\d{2}) (\d{2}\/\d{2}\/\d{2}) (.+)$`
+
+Column order: `amount \t saleDate postDate description`
+
+**Foreign-currency format:**
+
+Regex: `^(\d{2}\/\d{2}\/\d{2}) (\d{2}\/\d{2}\/\d{2}) (.+) ([\d,]+\.\d{2}-?)$`
+
+Column order: `saleDate postDate description amount`
+
+The line immediately following a foreign-currency transaction contains the original foreign-currency amount (e.g. `USD 22.40`). The parser detects this line via `/^[A-Z]{3} [\d,]+\.\d{2}$/` and skips it — it is not a separate transaction.
+
+**Amount sign convention (both formats):**
 - Trailing `-` in the amount string → negative (payment/credit)
 - No trailing `-` → positive (purchase)
 
