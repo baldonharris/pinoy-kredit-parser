@@ -10,7 +10,7 @@
 `pinoy-kredit-parser` is a lightweight, isomorphic TypeScript library that parses Philippine credit card statement PDFs into structured transaction data.
 
 - **Package name:** `pinoy-kredit-parser`
-- **Version:** `1.2.1`
+- **Version:** `1.3.1`
 - **License:** MIT
 - **Registry:** npm
 - **Repo:** https://github.com/baldonharris/pinoy-kredit-parser
@@ -40,10 +40,18 @@ Adding a new bank requires: a new enum value in `BankType`, a new parser file, a
 
 ### `parseKredit(input, options)`
 
-The single public entry point, exported from both `node.ts` and `browser.ts`.
+Parses transactions from a credit card statement PDF.
 
 ```ts
 parseKredit(input: NodeInput | BrowserInput, options: { bank: BankType }): Promise<KreditTransaction[]>
+```
+
+### `parseKreditMeta(input, options)`
+
+Parses statement-level metadata (Statement Date and Due Date) from a credit card statement PDF. Exported from both `node.ts` and `browser.ts`.
+
+```ts
+parseKreditMeta(input: NodeInput | BrowserInput, options: { bank: BankType }): Promise<KreditMeta>
 ```
 
 **Node input types** (`src/node.ts`):
@@ -69,6 +77,17 @@ type KreditTransaction = {
 ```
 
 > **Note:** Metrobank dates are `MM/DD` (no year) because that is how they appear in the raw PDF text.
+
+### `KreditMeta`
+
+```ts
+type KreditMeta = {
+  statementDate: string  // MM/DD/YYYY — normalized across all banks
+  dueDate: string        // MM/DD/YYYY — normalized across all banks
+}
+```
+
+Dates are normalized to `MM/DD/YYYY` regardless of how they appear in the raw PDF.
 
 ### `BankType`
 
@@ -142,6 +161,14 @@ Package `exports` field in `package.json` routes consumers to the correct build 
 
 **Date format:** `MM/DD/YY`
 
+**Meta pattern (raw text):**
+```
+JUL 28 2026\tJUL 05 2026
+PAYMENT DUE DATE\tSTATEMENT DATE
+```
+Regex: `/([A-Z]{3} \d{2} \d{4})\t([A-Z]{3} \d{2} \d{4})\nPAYMENT DUE DATE\tSTATEMENT DATE/`
+— Group 1 = dueDate, Group 2 = statementDate.
+
 ---
 
 ### 5.2 Metrobank (`src/parsers/metrobank.ts`)
@@ -158,6 +185,14 @@ Package `exports` field in `package.json` routes consumers to the correct build 
 
 **Note:** Lines may be optionally wrapped in double-quotes.
 
+**Meta pattern (raw text):**
+```
+Statement Date Payment Due Date
+21 June 2026 13 July 2026
+```
+Regex: `/Statement Date Payment Due Date\n(\d{1,2} \w+ \d{4}) (\d{1,2} \w+ \d{4})/`
+— Group 1 = statementDate, Group 2 = dueDate.
+
 ---
 
 ### 5.3 UnionBank (`src/parsers/unionbank.ts`)
@@ -173,6 +208,13 @@ Package `exports` field in `package.json` routes consumers to the correct build 
 **Date format:** `MM/DD/YY`
 
 **Note:** Amount is prefixed with `PHP` in the raw text. Lines may be optionally wrapped in double-quotes.
+
+**Meta pattern (raw text, from STATEMENT SUMMARY section):**
+```
+Statement Date : Jun 08, 2026
+Payment Due Date : Jun 25, 2026
+```
+Regexes: `/Statement Date\s*:\s*(\w{3} \d{2}, \d{4})/` and `/Payment Due Date\s*:\s*(\w{3} \d{2}, \d{4})/`
 
 ---
 
@@ -195,8 +237,7 @@ Package `exports` field in `package.json` routes consumers to the correct build 
 | `@typescript-eslint/*`           | Linting                  |
 | `eslint-config-prettier`         | Lint/format conflict resolution |
 | `@types/node`                    | Node.js type definitions |
-
-> There is currently **no test runner** (Jest/Vitest). Tests are a gap.
+| `vitest`                         | Test runner              |
 
 ---
 
@@ -207,6 +248,8 @@ Package `exports` field in `package.json` routes consumers to the correct build 
 | `npm run build`      | `rm -rf dist && tsc` — full clean rebuild            |
 | `npm run format`     | Prettier format all `src/**/*.ts`                    |
 | `npm run format:check` | Prettier check without writing                     |
+| `npm test`           | Run integration tests with Vitest (once)             |
+| `npm run test:watch` | Run Vitest in watch mode                             |
 | `npm publish`        | Triggers `prepublishOnly` → `build` automatically    |
 
 **TypeScript config highlights (`tsconfig.json`):**
@@ -238,13 +281,12 @@ const nextConfig = {
 - Credit card statements only — bank account or loan statements are out of scope.
 - Parser regexes are tightly coupled to each bank's current PDF layout; layout changes by the bank may break parsing.
 - Metrobank dates lack the year field.
-- No built-in test suite exists yet.
+- Integration test suite lives in `tests/integration.test.ts` and runs against PDF files in `sample/` (gitignored).
 
 ---
 
 ## 10. Known Gaps / Future Work
 
-- No automated tests (unit or integration).
 - No CI pipeline.
 - Metrobank year is not captured (would require heuristics or user-provided statement date).
 - Additional Philippine banks (BPI, BDO, Security Bank, etc.) are not yet supported.

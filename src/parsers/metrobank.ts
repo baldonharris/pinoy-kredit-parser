@@ -18,3 +18,11 @@ export const parseMetrobank = (text: string): KreditTransaction[] =>
         amount: isCredit ? -clean : clean,
       }
     })
+
+const metaRegex = /Statement Date Payment Due Date\n(\d{1,2} \w+ \d{4}) (\d{1,2} \w+ \d{4})/
+
+export const parseMetrobankMeta = (text: string): { statementDate: string; dueDate: string } => {
+  const m = metaRegex.exec(text)
+  if (!m) throw new Error('Metrobank: could not extract statement/due dates')
+  return { statementDate: m[1], dueDate: m[2] }
+}

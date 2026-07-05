@@ -18,3 +18,11 @@ export const parseRCBC = (text: string): KreditTransaction[] =>
         amount,
       }
     })
+
+const metaRegex = /([A-Z]{3} \d{2} \d{4})\t([A-Z]{3} \d{2} \d{4})\nPAYMENT DUE DATE\tSTATEMENT DATE/
+
+export const parseRCBCMeta = (text: string): { statementDate: string; dueDate: string } => {
+  const m = metaRegex.exec(text)
+  if (!m) throw new Error('RCBC: could not extract statement/due dates')
+  return { dueDate: m[1], statementDate: m[2] }
+}

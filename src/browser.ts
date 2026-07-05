@@ -1,4 +1,4 @@
-import { baseParseKredit } from './core'
+import { baseParseKredit, baseParseMeta } from './core'
 import { BankType } from './types'
 
 export * from './types'
@@ -9,4 +9,10 @@ export const parseKredit = async (input: BrowserInput, options: { bank: BankType
   const data = input instanceof File || input instanceof Blob ? await input.arrayBuffer() : input
 
   return baseParseKredit(new Uint8Array(data), options)
+}
+
+export const parseKreditMeta = async (input: BrowserInput, options: { bank: BankType }) => {
+  const data = input instanceof File || input instanceof Blob ? await input.arrayBuffer() : input
+
+  return baseParseMeta(new Uint8Array(data), options)
 }
