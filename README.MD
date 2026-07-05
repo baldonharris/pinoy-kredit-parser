@@ -17,8 +17,10 @@ Built for automation, personal finance tools, and data analysis.
 - Parse credit card statement PDFs
 - Bank-specific parsers
 - Structured transaction output
+- Isomorphic: shared logic for server-side and client-side parsing
 - Fast and dependency-light
 - Tailored for Philippine formats
+- Privacy-first: all parsing happens locally on your machine
 
 ---
 
@@ -39,9 +41,11 @@ npm install pinoy-kredit-parser
 ---
 
 ## Usage
+
 The library automatically detects your environment (Node vs. Browser) to provide the correct parsing engine.
 
 ### Using a file path (Node.js)
+
 ```javascript
 import { parseKredit, BankType } from 'pinoy-kredit-parser';
 
@@ -49,7 +53,9 @@ const transactions = await parseKredit('./statement.pdf', {
     bank: BankType.RCBC,
 });
 ```
+
 ### Browser / Next.js Client Components (File or ArrayBuffer)
+
 ```javascript
 import { parseKredit, BankType } from 'pinoy-kredit-parser';
 
@@ -61,8 +67,23 @@ const handleUpload = async (event) => {
 };
 ```
 
+### Parsing Statement Metadata
+
+Use `parseKreditMeta` to extract statement-level dates (Statement Date and Due Date):
+
+```javascript
+import { parseKreditMeta, BankType } from 'pinoy-kredit-parser';
+
+const meta = await parseKreditMeta('./statement.pdf', {
+    bank: BankType.RCBC,
+});
+// { statementDate: '07/05/2026', dueDate: '07/28/2026' }
+```
+
 ### Next.js (App Router / API Routes)
+
 When using this library in Next.js, you must add it to `serverExternalPackages` in your `next.config.ts` to correctly handle the native PDF rendering binaries.
+
 ```javascript
 // next.config.ts
 const nextConfig = {
@@ -76,16 +97,19 @@ const nextConfig = {
 
 ## Output Format
 
-Transactions are returned in a clean, structured format:
+### Transactions (`parseKredit`)
+
 ```typescript
 type KreditTransaction = {
-  saleDate: string;    // MM/DD/YY
-  postDate: string;    // MM/DD/YY
+  saleDate: string;    // MM/DD/YY (RCBC, UnionBank) or MM/DD (Metrobank)
+  postDate: string;    // MM/DD/YY (RCBC, UnionBank) or MM/DD (Metrobank)
   description: string;
   amount: number;      // Positive for purchases, negative for payments/credits
 }
 ```
+
 Example:
+
 ```json
 [
   {
@@ -96,18 +120,31 @@ Example:
   }
 ]
 ```
----
-## Features
-- **Isomorphic:** Shared logic for server-side and client-side parsing.
-- **Zero Global Pollution:** No need for manual DOMMatrix or Canvas polyfills.
-- **Next.js Ready:** Optimized for modern frameworks with automatic environment detection.
-- **Privacy-First:** All parsing happens locally on your machine. No data is ever sent to a server.
+
+### Metadata (`parseKreditMeta`)
+
+```typescript
+type KreditMeta = {
+  statementDate: string;  // MM/DD/YYYY — normalized across all banks
+  dueDate: string;        // MM/DD/YYYY — normalized across all banks
+}
+```
+
+Example:
+
+```json
+{
+  "statementDate": "07/05/2026",
+  "dueDate": "07/28/2026"
+}
+```
 
 ---
 
 ## Supported Banks
 
 Specify the bank using `BankType`:
+
 ```javascript
 BankType.RCBC
 BankType.METROBANK
@@ -121,6 +158,7 @@ BankType.UNIONBANK
 - Designed for credit card statements only
 - Requires text-based PDFs (not scanned images)
 - Changes in bank statement layouts may break parsing
+- Metrobank dates do not include the year
 - Currently supports selected Philippine banks only
 
 ---
