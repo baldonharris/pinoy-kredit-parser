@@ -22,7 +22,10 @@ describe('RCBC', () => {
   const fxRegex = /^(\d{2}\/\d{2}\/\d{2}) (\d{2}\/\d{2}\/\d{2}) (.+) ([\d,]+\.\d{2}-?)$/gm
 
   it('parses all transactions visible in raw PDF text', async () => {
-    const [text, txns] = await Promise.all([extractText(pdf), parseKredit(pdf, { bank: BankType.RCBC })])
+    const [text, txns] = await Promise.all([
+      extractText(pdf),
+      parseKredit(pdf, { bank: BankType.RCBC }),
+    ])
 
     const rawStd = [...text.matchAll(stdRegex)]
     const rawFx = [...text.matchAll(fxRegex)]
@@ -55,6 +58,7 @@ describe('RCBC', () => {
 
   it('parses meta', async () => {
     const meta = await parseKreditMeta(pdf, { bank: BankType.RCBC })
+    expect(meta.cardLastFour).toBe('4004')
     expect(meta.statementDate).toMatch(/^\d{2}\/\d{2}\/\d{4}$/)
     expect(meta.dueDate).toMatch(/^\d{2}\/\d{2}\/\d{4}$/)
   })
@@ -66,7 +70,10 @@ describe('Metrobank', () => {
   const rawRegex = /^"?(\d{2}\/\d{2})\s+(\d{2}\/\d{2})\s+(.+?)\s+([\d,]+\.\d{2}C?)"?$/gm
 
   it('parses all transactions visible in raw PDF text', async () => {
-    const [text, txns] = await Promise.all([extractText(pdf), parseKredit(pdf, { bank: BankType.METROBANK })])
+    const [text, txns] = await Promise.all([
+      extractText(pdf),
+      parseKredit(pdf, { bank: BankType.METROBANK }),
+    ])
 
     const rawTotal = [...text.matchAll(rawRegex)].length
     expect(txns.length).toBe(rawTotal)
@@ -86,6 +93,7 @@ describe('Metrobank', () => {
 
   it('parses meta', async () => {
     const meta = await parseKreditMeta(pdf, { bank: BankType.METROBANK })
+    expect(meta.cardLastFour).toBe('5823')
     expect(meta.statementDate).toMatch(/^\d{2}\/\d{2}\/\d{4}$/)
     expect(meta.dueDate).toMatch(/^\d{2}\/\d{2}\/\d{4}$/)
   })
@@ -94,10 +102,14 @@ describe('Metrobank', () => {
 describe('UnionBank', () => {
   const pdf = join(sampleDir, 'Unionbank.pdf')
 
-  const rawRegex = /^"?(\d{2}\/\d{2}\/\d{2})\s+(\d{2}\/\d{2}\/\d{2})\s+(.+?)\s+PHP\s+(-?[\d,]+\.\d{2})"?$/gm
+  const rawRegex =
+    /^"?(\d{2}\/\d{2}\/\d{2})\s+(\d{2}\/\d{2}\/\d{2})\s+(.+?)\s+PHP\s+(-?[\d,]+\.\d{2})"?$/gm
 
   it('parses all transactions visible in raw PDF text', async () => {
-    const [text, txns] = await Promise.all([extractText(pdf), parseKredit(pdf, { bank: BankType.UNIONBANK })])
+    const [text, txns] = await Promise.all([
+      extractText(pdf),
+      parseKredit(pdf, { bank: BankType.UNIONBANK }),
+    ])
 
     const rawTotal = [...text.matchAll(rawRegex)].length
     expect(txns.length).toBe(rawTotal)
@@ -117,6 +129,7 @@ describe('UnionBank', () => {
 
   it('parses meta', async () => {
     const meta = await parseKreditMeta(pdf, { bank: BankType.UNIONBANK })
+    expect(meta.cardLastFour).toBe('3403')
     expect(meta.statementDate).toMatch(/^\d{2}\/\d{2}\/\d{4}$/)
     expect(meta.dueDate).toMatch(/^\d{2}\/\d{2}\/\d{4}$/)
   })

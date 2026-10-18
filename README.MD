@@ -69,7 +69,7 @@ const handleUpload = async (event) => {
 
 ### Parsing Statement Metadata
 
-Use `parseKreditMeta` to extract statement-level dates (Statement Date and Due Date):
+Use `parseKreditMeta` to extract statement-level dates and the card’s last four digits:
 
 ```javascript
 import { parseKreditMeta, BankType } from 'pinoy-kredit-parser';
@@ -77,7 +77,7 @@ import { parseKreditMeta, BankType } from 'pinoy-kredit-parser';
 const meta = await parseKreditMeta('./statement.pdf', {
     bank: BankType.RCBC,
 });
-// { statementDate: '07/05/2026', dueDate: '07/28/2026' }
+// { statementDate: '07/05/2026', dueDate: '07/28/2026', cardLastFour: '0007' }
 ```
 
 ### Next.js (App Router / API Routes)
@@ -127,6 +127,7 @@ Example:
 type KreditMeta = {
   statementDate: string;  // MM/DD/YYYY — normalized across all banks
   dueDate: string;        // MM/DD/YYYY — normalized across all banks
+  cardLastFour: string | null; // Last four digits; null if missing or ambiguous
 }
 ```
 
@@ -135,7 +136,8 @@ Example:
 ```json
 {
   "statementDate": "07/05/2026",
-  "dueDate": "07/28/2026"
+  "dueDate": "07/28/2026",
+  "cardLastFour": "0007"
 }
 ```
 

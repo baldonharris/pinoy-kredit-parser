@@ -8,6 +8,7 @@ export type KreditTransaction = {
 export type KreditMeta = {
   statementDate: string // MM/DD/YYYY
   dueDate: string // MM/DD/YYYY
+  cardLastFour: string | null
 }
 
 export enum BankType {

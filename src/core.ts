@@ -79,7 +79,7 @@ export const baseParseMeta = async (
 
   const { text } = await parser.getText()
 
-  let raw: { statementDate: string; dueDate: string }
+  let raw: KreditMeta
   switch (options.bank) {
     case BankType.RCBC:
       raw = parseRCBCMeta(text)
@@ -97,5 +97,6 @@ export const baseParseMeta = async (
   return {
     statementDate: normalizeMetaDate(raw.statementDate),
     dueDate: normalizeMetaDate(raw.dueDate),
+    cardLastFour: raw.cardLastFour,
   }
 }

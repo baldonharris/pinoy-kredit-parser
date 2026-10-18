@@ -1,4 +1,5 @@
 import { KreditTransaction } from '../types'
+import { extractCardLastFour } from './card'
 
 const regex = /^"?(\d{2}\/\d{2})\s+(\d{2}\/\d{2})\s+(.+?)\s+([\d,]+\.\d{2}C?)"?$/
 export const parseMetrobank = (text: string): KreditTransaction[] =>
@@ -21,8 +22,14 @@ export const parseMetrobank = (text: string): KreditTransaction[] =>
 
 const metaRegex = /Statement Date Payment Due Date\n(\d{1,2} \w+ \d{4}) (\d{1,2} \w+ \d{4})/
 
-export const parseMetrobankMeta = (text: string): { statementDate: string; dueDate: string } => {
+export const parseMetrobankMeta = (
+  text: string,
+): { statementDate: string; dueDate: string; cardLastFour: string | null } => {
   const m = metaRegex.exec(text)
   if (!m) throw new Error('Metrobank: could not extract statement/due dates')
-  return { statementDate: m[1], dueDate: m[2] }
+  return {
+    statementDate: m[1],
+    dueDate: m[2],
+    cardLastFour: extractCardLastFour(text, 'CREDIT CARD ACCOUNT'),
+  }
 }

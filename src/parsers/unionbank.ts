@@ -1,4 +1,5 @@
 import { KreditTransaction } from '../types'
+import { extractCardLastFour } from './card'
 
 const regex =
   /^"?(\d{2}\/\d{2}\/\d{2})\s+(\d{2}\/\d{2}\/\d{2})\s+(.+?)\s+PHP\s+(-?[\d,]+\.\d{2})"?$/
@@ -17,9 +18,15 @@ export const parseUnionBank = (text: string): KreditTransaction[] =>
 const stmtRegex = /Statement Date\s*:\s*(\w{3} \d{2}, \d{4})/
 const dueRegex = /Payment Due Date\s*:\s*(\w{3} \d{2}, \d{4})/
 
-export const parseUnionBankMeta = (text: string): { statementDate: string; dueDate: string } => {
+export const parseUnionBankMeta = (
+  text: string,
+): { statementDate: string; dueDate: string; cardLastFour: string | null } => {
   const sm = stmtRegex.exec(text)
   const dm = dueRegex.exec(text)
   if (!sm || !dm) throw new Error('UnionBank: could not extract statement/due dates')
-  return { statementDate: sm[1], dueDate: dm[1] }
+  return {
+    statementDate: sm[1],
+    dueDate: dm[1],
+    cardLastFour: extractCardLastFour(text, 'CARD NO\\.'),
+  }
 }

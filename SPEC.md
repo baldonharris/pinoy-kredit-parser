@@ -10,7 +10,7 @@
 `pinoy-kredit-parser` is a lightweight, isomorphic TypeScript library that parses Philippine credit card statement PDFs into structured transaction data.
 
 - **Package name:** `pinoy-kredit-parser`
-- **Version:** `1.3.2`
+- **Version:** `1.4.0`
 - **License:** MIT
 - **Registry:** npm
 - **Repo:** https://github.com/baldonharris/pinoy-kredit-parser
@@ -48,7 +48,7 @@ parseKredit(input: NodeInput | BrowserInput, options: { bank: BankType }): Promi
 
 ### `parseKreditMeta(input, options)`
 
-Parses statement-level metadata (Statement Date and Due Date) from a credit card statement PDF. Exported from both `node.ts` and `browser.ts`.
+Parses statement-level metadata (Statement Date, Due Date, and card last four digits) from a credit card statement PDF. Exported from both `node.ts` and `browser.ts`.
 
 ```ts
 parseKreditMeta(input: NodeInput | BrowserInput, options: { bank: BankType }): Promise<KreditMeta>
@@ -84,10 +84,13 @@ type KreditTransaction = {
 type KreditMeta = {
   statementDate: string  // MM/DD/YYYY — normalized across all banks
   dueDate: string        // MM/DD/YYYY — normalized across all banks
+  cardLastFour: string | null // Final four digits; preserves leading zeros
 }
 ```
 
 Dates are normalized to `MM/DD/YYYY` regardless of how they appear in the raw PDF.
+
+`cardLastFour` extracts only the final four digits from a labeled full or masked card number. Missing, malformed, or multiple distinct card endings return `null` without affecting date parsing. Repeated matching endings are accepted. Full card numbers are never returned.
 
 ### `BankType`
 
@@ -151,6 +154,8 @@ Package `exports` field in `package.json` routes consumers to the correct build 
 
 ### 5.1 RCBC (`src/parsers/rcbc.ts`)
 
+**Card identifier:** Match `CARD NUMBER` with a full or masked number, allowing spaces, hyphens, and PDF whitespace. Return its last four digits only. RCBC also extracts the number appearing immediately above a card product line and the label, matching the sample PDF text order.
+
 RCBC statements contain two transaction line formats:
 
 **Standard (domestic) format:**
@@ -185,6 +190,8 @@ Regex: `/([A-Z]{3} \d{2} \d{4})\t([A-Z]{3} \d{2} \d{4})\nPAYMENT DUE DATE\tSTATE
 
 ### 5.2 Metrobank (`src/parsers/metrobank.ts`)
 
+**Card identifier:** Match `CREDIT CARD ACCOUNT` with a full or masked number, allowing spaces, hyphens, and PDF whitespace. Return its last four digits only.
+
 **Regex:** `^"?(\d{2}\/\d{2})\s+(\d{2}\/\d{2})\s+(.+?)\s+([\d,]+\.\d{2}C?)"?$`
 
 **Column order in raw text:** `saleDate postDate description amount`
@@ -208,6 +215,8 @@ Regex: `/Statement Date Payment Due Date\n(\d{1,2} \w+ \d{4}) (\d{1,2} \w+ \d{4}
 ---
 
 ### 5.3 UnionBank (`src/parsers/unionbank.ts`)
+
+**Card identifier:** Match `CARD NO.` with a full or masked number, allowing spaces, hyphens, and PDF whitespace. Return its last four digits only.
 
 **Regex:** `^"?(\d{2}\/\d{2}\/\d{2})\s+(\d{2}\/\d{2}\/\d{2})\s+(.+?)\s+PHP\s+(-?[\d,]+\.\d{2})"?$`
 
@@ -289,7 +298,8 @@ const nextConfig = {
 
 ## 9. Constraints & Limitations
 
-- Text-based PDFs only — scanned/image PDFs are not supported.
+- Text-based PDFs only — scanned/image PDFs are not supported. Screenshots illustrate layout but are not parser inputs.
+- Card identification is statement-level; missing or ambiguous endings return `null`.
 - Credit card statements only — bank account or loan statements are out of scope.
 - Parser regexes are tightly coupled to each bank's current PDF layout; layout changes by the bank may break parsing.
 - Metrobank dates lack the year field.
