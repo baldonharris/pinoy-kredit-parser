@@ -280,6 +280,12 @@ Regexes: `/Statement Date\s*:\s*(\w{3} \d{2}, \d{4})/` and `/Payment Due Date\s*
 - `declaration: true` (emits `.d.ts` files)
 - `sourceMap: true`
 
+### Automated npm releases
+
+`.github/workflows/publish.yml` publishes on `v*` tag pushes or a manual workflow dispatch. It uses GitHub-hosted runners, Node 24, npm 11 (supporting OIDC), and job permissions `contents: read` and `id-token: write`. Publishing authenticates through npm trusted publishing without an `NPM_TOKEN` secret.
+
+The npm package's trusted publisher must authorize GitHub user `baldonharris`, repository `pinoy-kredit-parser`, workflow filename `publish.yml`, and direct `npm publish`. To retry an unpublished version after changing the workflow, manually dispatch the updated workflow from `main`; rerunning an old tag run uses its old workflow. No version bump is needed for a failed publish that did not create the version.
+
 ---
 
 ## 8. Next.js Integration
